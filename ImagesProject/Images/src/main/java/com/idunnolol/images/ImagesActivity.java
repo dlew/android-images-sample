@@ -6,7 +6,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -14,8 +13,6 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 
 public class ImagesActivity extends Activity {
-
-    private static final String TAG = "Images";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +32,7 @@ public class ImagesActivity extends Activity {
 
         String query = intent.getStringExtra(SearchManager.QUERY);
 
-        Log.i(TAG, "Received search string: " + query);
+        Log.i("Received search string: " + query);
     }
 
     @Override
