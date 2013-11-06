@@ -66,7 +66,10 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        search(intent.getStringExtra(SearchManager.QUERY));
+        String query = intent.getStringExtra(SearchManager.QUERY);
+        if (!TextUtils.isEmpty(query)) {
+            search(query);
+        }
     }
 
     private void search(String query) {
