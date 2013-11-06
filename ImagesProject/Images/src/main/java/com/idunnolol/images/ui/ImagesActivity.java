@@ -40,6 +40,9 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
         else {
             mImagesFragment = Ui.findFragment(this, ImagesFragment.TAG);
             mDataFragment = Ui.findFragment(this, ImageDataFragment.TAG);
+
+            // Load current data in data fragment into images fragment
+            mImagesFragment.bind(mDataFragment.getImageUrls(), mDataFragment.canLoadMore());
         }
     }
 

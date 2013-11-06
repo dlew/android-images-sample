@@ -26,6 +26,7 @@ public class ImagesFragment extends Fragment {
 
     private ImagesAdapter mAdapter;
 
+    private List<String> mImageUrls;
     private boolean mCanLoadMore;
 
     @Override
@@ -47,21 +48,26 @@ public class ImagesFragment extends Fragment {
         mGridView.setAdapter(mAdapter);
         mGridView.setOnScrollListener(mScrollListener);
 
+        bind(mImageUrls, mCanLoadMore);
+
         return rootView;
     }
 
     public void bind(List<String> imageUrls, boolean canLoadMore) {
+        mImageUrls = imageUrls;
         mCanLoadMore = canLoadMore;
 
-        if (imageUrls.size() == 0) {
-            mGridView.setVisibility(View.GONE);
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
-        else {
-            mGridView.setVisibility(View.VISIBLE);
-            mProgressBar.setVisibility(View.GONE);
+        if (mGridView != null && mProgressBar != null) {
+            if (imageUrls == null || imageUrls.size() == 0) {
+                mGridView.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+            else {
+                mGridView.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.GONE);
 
-            mAdapter.bind(imageUrls, canLoadMore);
+                mAdapter.bind(imageUrls, canLoadMore);
+            }
         }
     }
 
