@@ -39,6 +39,16 @@ public class ImagesAdapter extends BaseAdapter {
     }
 
     @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
+    }
+
+    @Override
     public int getViewTypeCount() {
         return 2;
     }
