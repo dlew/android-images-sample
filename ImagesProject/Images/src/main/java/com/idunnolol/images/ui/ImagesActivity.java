@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -44,8 +45,6 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
                     .add(R.id.container, mImagesFragment, ImagesFragment.TAG)
                     .add(mDataFragment, ImageDataFragment.TAG)
                     .commit();
-
-            (new LoadFirstSuggestionTask()).execute();
         }
         else {
             mImagesFragment = Ui.findFragment(this, ImagesFragment.TAG);
@@ -53,6 +52,12 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
 
             // Load current data in data fragment into images fragment
             mImagesFragment.bind(mDataFragment.getImageUrls(), mDataFragment.canLoadMore());
+        }
+
+        if (TextUtils.isEmpty(mDataFragment.getQuery())) {
+            (new LoadFirstSuggestionTask()).execute();
+        }
+        else {
             setTitle(getString(R.string.search_title_TEMPLATE, mDataFragment.getQuery()));
         }
     }
