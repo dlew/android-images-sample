@@ -82,6 +82,10 @@ public class ImageDataFragment extends Fragment {
         }
     }
 
+    public String getQuery() {
+        return mQuery;
+    }
+
     public List<String> getImageUrls() {
         return mImageUrls;
     }
