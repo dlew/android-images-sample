@@ -4,45 +4,47 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.view.Menu;
 import android.widget.SearchView;
 
-import com.android.volley.Network;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.BasicNetwork;
-import com.android.volley.toolbox.DiskBasedCache;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.idunnolol.images.utils.Log;
 import com.idunnolol.images.R;
 import com.idunnolol.images.content.RecentImagesSuggestionsProvider;
+import com.idunnolol.images.utils.Ui;
+import com.idunnolol.images.utils.VolleyUtils;
 
-import org.json.JSONObject;
+import java.util.List;
 
-public class ImagesActivity extends Activity {
+public class ImagesActivity extends Activity implements ImageDataFragment.ImageDataFragmentListener {
 
     private RequestQueue mRequestQueue;
+
+    private ImagesFragment mImagesFragment;
+    private ImageDataFragment mDataFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DiskBasedCache cache = new DiskBasedCache(getCacheDir());
-        Network network = new BasicNetwork(new HurlStack());
-        mRequestQueue = new RequestQueue(cache, network);
+        mRequestQueue = VolleyUtils.createRequestQueue(this);
 
         setContentView(R.layout.activity_images);
 
         if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new ImagesFragment())
+            mImagesFragment = new ImagesFragment();
+            mDataFragment = new ImageDataFragment();
+
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container, mImagesFragment, ImagesFragment.TAG)
+                    .add(mDataFragment, ImageDataFragment.TAG)
                     .commit();
+        }
+        else {
+            mImagesFragment = Ui.findFragment(this, ImagesFragment.TAG);
+            mDataFragment = Ui.findFragment(this, ImageDataFragment.TAG);
         }
     }
 
@@ -57,27 +59,8 @@ public class ImagesActivity extends Activity {
                 RecentImagesSuggestionsProvider.AUTHORITY, RecentImagesSuggestionsProvider.MODE);
         suggestions.saveRecentQuery(query, null);
 
-        // Construct the URL
-        Uri.Builder uriBuilder = Uri.parse("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8")
-                .buildUpon();
-        uriBuilder.appendQueryParameter("q", query);
-
-        mRequestQueue.add(new JsonObjectRequest(Request.Method.GET, uriBuilder.build().toString(), null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-                        Log.i("Response: " + jsonObject);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Log.e("VolleyError: " + volleyError);
-                    }
-                }
-        ));
-
-        Log.i("Received search string: " + query);
+        // Set the new query
+        mDataFragment.setQuery(query);
     }
 
     @Override
@@ -108,4 +91,20 @@ public class ImagesActivity extends Activity {
         return true;
     }
 
+    // ImageDataFragmentListener
+
+    @Override
+    public void onLoadingImages() {
+        // TODO
+    }
+
+    @Override
+    public void onImagesLoaded(List<String> imageUrls, boolean canLoadMore) {
+        // TODO
+    }
+
+    @Override
+    public void onImageLoadError() {
+        // TODO
+    }
 }

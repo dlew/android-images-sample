@@ -13,6 +13,8 @@ import com.idunnolol.images.utils.Ui;
 
 public class ImagesFragment extends Fragment {
 
+    public static final String TAG = ImagesFragment.class.getName();
+
     private GridView mGridView;
     private ProgressBar mProgressBar;
 
