@@ -29,7 +29,7 @@ public class ImagesFragment extends Fragment {
     private ImagesAdapter mAdapter;
 
     private List<String> mImageUrls;
-    private boolean mCanLoadMore;
+    private boolean mCanLoadMore = true;
 
     @Override
     public void onAttach(Activity activity) {

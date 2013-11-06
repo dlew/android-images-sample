@@ -2,8 +2,13 @@ package com.idunnolol.images.ui;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.view.Menu;
@@ -40,6 +45,8 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
                     .add(R.id.container, mImagesFragment, ImagesFragment.TAG)
                     .add(mDataFragment, ImageDataFragment.TAG)
                     .commit();
+
+            (new LoadFirstSuggestionTask()).execute();
         }
         else {
             mImagesFragment = Ui.findFragment(this, ImagesFragment.TAG);
@@ -54,8 +61,10 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        String query = intent.getStringExtra(SearchManager.QUERY);
+        search(intent.getStringExtra(SearchManager.QUERY));
+    }
 
+    private void search(String query) {
         // Save search to recents
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                 RecentImagesSuggestionsProvider.AUTHORITY, RecentImagesSuggestionsProvider.MODE);
@@ -106,6 +115,42 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
         });
 
         return true;
+    }
+
+    // A simple AsyncTask for load
+
+    private class LoadFirstSuggestionTask extends AsyncTask<Void, Void, Cursor> {
+        @Override
+        protected Cursor doInBackground(Void... params) {
+            // We have to act like the SearchManager here in order to query the last search...
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchableInfo searchable = searchManager.getSearchableInfo(getComponentName());
+
+            Uri.Builder uriBuilder = new Uri.Builder()
+                    .scheme(ContentResolver.SCHEME_CONTENT)
+                    .authority(RecentImagesSuggestionsProvider.AUTHORITY);
+            uriBuilder.appendPath(SearchManager.SUGGEST_URI_PATH_QUERY);
+            uriBuilder.appendQueryParameter(SearchManager.SUGGEST_PARAMETER_LIMIT, String.valueOf(1));
+            Uri uri = uriBuilder.build();
+
+            String selection = searchable.getSuggestSelection();
+            String[] selArgs = new String[] { "" };
+
+            return getContentResolver().query(uri, null, selection, selArgs, null);
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            if (cursor.getCount() == 0) {
+                // If there are no recent searches, search for "Android" by default
+                search(getString(R.string.default_search));
+            }
+            else {
+                cursor.moveToFirst();
+                int queryIndex = cursor.getColumnIndex(SearchManager.SUGGEST_COLUMN_QUERY);
+                search(cursor.getString(queryIndex));
+            }
+        }
     }
 
     // ImageDataFragmentListener
