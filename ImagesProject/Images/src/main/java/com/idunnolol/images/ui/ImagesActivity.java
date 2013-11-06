@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 
 import com.idunnolol.images.R;
@@ -54,6 +53,7 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
 
             // Load current data in data fragment into images fragment
             mImagesFragment.bind(mDataFragment.getImageUrls(), mDataFragment.canLoadMore());
+            setTitle(getString(R.string.search_title_TEMPLATE, mDataFragment.getQuery()));
         }
     }
 
@@ -72,6 +72,7 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
 
         // Set the new query
         mDataFragment.setQuery(query);
+        setTitle(getString(R.string.search_title_TEMPLATE, query));
     }
 
     @Override
@@ -82,13 +83,6 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
         final MenuItem searchItem = menu.findItem(R.id.search);
         mSearchView = (SearchView) searchItem.getActionView();
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // When we open the search view, we want to show the current query
-                mSearchView.setQuery(mDataFragment.getQuery(), false);
-            }
-        });
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
