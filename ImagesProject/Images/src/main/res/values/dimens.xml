@@ -3,4 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    </resources>
+    <!-- Size of each GridView cell; all should be square -->
+    <dimen name="cell_size">96dp</dimen>
+</resources>
