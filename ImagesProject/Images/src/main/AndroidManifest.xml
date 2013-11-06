@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme"
         android:name="com.idunnolol.images.ImagesApplication">
         <activity
-            android:name="com.idunnolol.images.ImagesActivity"
+            android:name=".ui.ImagesActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
