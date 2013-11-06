@@ -2,6 +2,8 @@ package com.idunnolol.images;
 
 import android.app.Application;
 
+import com.idunnolol.images.utils.Log;
+
 public class ImagesApplication extends Application {
 
     @Override

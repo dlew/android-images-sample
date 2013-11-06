@@ -19,7 +19,7 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.idunnolol.images.Log;
+import com.idunnolol.images.utils.Log;
 import com.idunnolol.images.R;
 import com.idunnolol.images.content.RecentImagesSuggestionsProvider;
 

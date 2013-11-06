@@ -1,4 +1,4 @@
-package com.idunnolol.images;
+package com.idunnolol.images.utils;
 
 /**
  * Custom implementation of Log that adds extra functionality.  It functions
