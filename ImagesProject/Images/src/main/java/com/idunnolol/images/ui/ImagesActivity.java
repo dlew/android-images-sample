@@ -9,17 +9,13 @@ import android.provider.SearchRecentSuggestions;
 import android.view.Menu;
 import android.widget.SearchView;
 
-import com.android.volley.RequestQueue;
 import com.idunnolol.images.R;
 import com.idunnolol.images.content.RecentImagesSuggestionsProvider;
 import com.idunnolol.images.utils.Ui;
-import com.idunnolol.images.utils.VolleyUtils;
 
 import java.util.List;
 
 public class ImagesActivity extends Activity implements ImageDataFragment.ImageDataFragmentListener {
-
-    private RequestQueue mRequestQueue;
 
     private ImagesFragment mImagesFragment;
     private ImageDataFragment mDataFragment;
@@ -27,8 +23,6 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mRequestQueue = VolleyUtils.createRequestQueue(this);
 
         setContentView(R.layout.activity_images);
 
@@ -61,20 +55,6 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
 
         // Set the new query
         mDataFragment.setQuery(query);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        mRequestQueue.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        mRequestQueue.stop();
     }
 
     @Override

@@ -7,12 +7,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.idunnolol.images.ImagesApplication;
 import com.idunnolol.images.utils.Log;
-import com.idunnolol.images.utils.VolleyUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,8 +29,6 @@ public class ImageDataFragment extends Fragment {
 
     // Number of results to request at a time
     private static final int STEP = 8;
-
-    private RequestQueue mRequestQueue;
 
     private ImageDataFragmentListener mListener;
 
@@ -53,18 +50,6 @@ public class ImageDataFragment extends Fragment {
         super.onAttach(activity);
 
         mListener = (ImageDataFragmentListener) activity;
-
-        if (mRequestQueue == null) {
-            mRequestQueue = VolleyUtils.createRequestQueue(activity);
-        }
-        mRequestQueue.start();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        mRequestQueue.stop();
     }
 
     // Controls
@@ -105,7 +90,7 @@ public class ImageDataFragment extends Fragment {
 
             Log.i("Query: " + url);
 
-            mRequestQueue.add(new JsonObjectRequest(Request.Method.GET, url, null,
+            ImagesApplication.sRequestQueue.add(new JsonObjectRequest(Request.Method.GET, url, null,
                     mImageResponseListener, mImageResponseErrorListener));
         }
     }
