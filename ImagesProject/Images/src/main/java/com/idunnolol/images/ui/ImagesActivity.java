@@ -43,8 +43,6 @@ public class ImagesActivity extends Activity {
             getFragmentManager().beginTransaction()
                     .add(R.id.container, new ImagesFragment())
                     .commit();
-
-
         }
     }
 
