@@ -13,13 +13,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import com.android.volley.Network;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.idunnolol.images.content.RecentImagesSuggestionsProvider;
 
+import org.json.JSONObject;
+
 public class ImagesActivity extends Activity {
+
+    private RequestQueue mRequestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DiskBasedCache cache = new DiskBasedCache(getCacheDir());
+        Network network = new BasicNetwork(new HurlStack());
+        mRequestQueue = new RequestQueue(cache, network);
+
         setContentView(R.layout.activity_images);
 
         if (savedInstanceState == null) {
@@ -39,7 +57,36 @@ public class ImagesActivity extends Activity {
                 RecentImagesSuggestionsProvider.AUTHORITY, RecentImagesSuggestionsProvider.MODE);
         suggestions.saveRecentQuery(query, null);
 
+        mRequestQueue.add(new JsonObjectRequest(Request.Method.GET, "http://ip.jsontest.com/", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.i("IP: " + jsonObject.optString("ip"));
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        Log.e("VolleyError: " + volleyError);
+                    }
+                }
+        ));
+
         Log.i("Received search string: " + query);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mRequestQueue.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mRequestQueue.stop();
     }
 
     @Override
