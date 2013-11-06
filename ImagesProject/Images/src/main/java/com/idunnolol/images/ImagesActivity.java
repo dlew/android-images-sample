@@ -2,14 +2,20 @@ package com.idunnolol.images;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 public class ImagesActivity extends Activity {
+
+    private static final String TAG = "Images";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,15 +30,26 @@ public class ImagesActivity extends Activity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.images, menu);
-        return true;
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        String query = intent.getStringExtra(SearchManager.QUERY);
+
+        Log.i(TAG, "Received search string: " + query);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.images, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+
+        return true;
     }
 
     /**
