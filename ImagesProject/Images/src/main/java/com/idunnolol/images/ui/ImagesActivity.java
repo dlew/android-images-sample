@@ -15,7 +15,8 @@ import com.idunnolol.images.utils.Ui;
 
 import java.util.List;
 
-public class ImagesActivity extends Activity implements ImageDataFragment.ImageDataFragmentListener {
+public class ImagesActivity extends Activity implements ImageDataFragment.ImageDataFragmentListener,
+        ImagesFragment.ImagesFragmentListener {
 
     private ImagesFragment mImagesFragment;
     private ImageDataFragment mDataFragment;
@@ -81,5 +82,12 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
     @Override
     public void onImageLoadError() {
         // TODO
+    }
+
+    // ImagesFragmentListener
+
+    @Override
+    public void onRequestMoreImages() {
+        mDataFragment.requestMoreImages();
     }
 }

@@ -30,6 +30,9 @@ public class ImageDataFragment extends Fragment {
     // Number of results to request at a time
     private static final int STEP = 8;
 
+    // The maximum number of images Google will return before erroring out
+    private static final int MAX_IMAGES = 64;
+
     private ImageDataFragmentListener mListener;
 
     private String mQuery;
@@ -37,6 +40,8 @@ public class ImageDataFragment extends Fragment {
     private List<String> mImageUrls = new ArrayList<String>();
 
     private long mResultCount;
+
+    private JsonObjectRequest mCurrentRequest;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,26 +77,37 @@ public class ImageDataFragment extends Fragment {
     }
 
     public boolean canLoadMore() {
-        return mImageUrls.size() < mResultCount;
+        int size = mImageUrls.size();
+        return size < mResultCount && size < MAX_IMAGES;
     }
 
     // Image requests
 
     public void requestMoreImages() {
-        if (canLoadMore()) {
+        if (canLoadMore()
+                && (mCurrentRequest == null || mCurrentRequest.hasHadResponseDelivered())) {
             // Construct the URL
             Uri.Builder uriBuilder = Uri.parse("https://ajax.googleapis.com/ajax/services/search/images?v=1.0")
                     .buildUpon();
             uriBuilder.appendQueryParameter("q", mQuery);
-            uriBuilder.appendQueryParameter("start", Integer.toString(mImageUrls.size()));
-            uriBuilder.appendQueryParameter("rsz", Integer.toString(STEP));
+
+            // Make sure we don't go over the image limit
+            int start = mImageUrls.size();
+            int step = STEP;
+            if (start + step > MAX_IMAGES) {
+                step -= (start + step) - MAX_IMAGES;
+            }
+
+            uriBuilder.appendQueryParameter("start", Integer.toString(start));
+            uriBuilder.appendQueryParameter("rsz", Integer.toString(step));
 
             String url = uriBuilder.build().toString();
 
             Log.i("Query: " + url);
 
-            ImagesApplication.sRequestQueue.add(new JsonObjectRequest(Request.Method.GET, url, null,
-                    mImageResponseListener, mImageResponseErrorListener));
+            mCurrentRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                    mImageResponseListener, mImageResponseErrorListener);
+            ImagesApplication.sRequestQueue.add(mCurrentRequest);
         }
     }
 
@@ -99,6 +115,10 @@ public class ImageDataFragment extends Fragment {
         @Override
         public void onResponse(JSONObject jsonObject) {
             JSONObject responseData = jsonObject.optJSONObject("responseData");
+
+            if (responseData == null) {
+                Log.w("What is happening:\n" + jsonObject);
+            }
 
             // Parse results
             JSONArray results = responseData.optJSONArray("results");
