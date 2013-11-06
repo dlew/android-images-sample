@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.view.LayoutInflater;
@@ -53,15 +54,21 @@ public class ImagesActivity extends Activity {
 
         String query = intent.getStringExtra(SearchManager.QUERY);
 
+        // Save search to recents
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                 RecentImagesSuggestionsProvider.AUTHORITY, RecentImagesSuggestionsProvider.MODE);
         suggestions.saveRecentQuery(query, null);
 
-        mRequestQueue.add(new JsonObjectRequest(Request.Method.GET, "http://ip.jsontest.com/", null,
+        // Construct the URL
+        Uri.Builder uriBuilder = Uri.parse("https://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8")
+                .buildUpon();
+        uriBuilder.appendQueryParameter("q", query);
+
+        mRequestQueue.add(new JsonObjectRequest(Request.Method.GET, uriBuilder.build().toString(), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
-                        Log.i("IP: " + jsonObject.optString("ip"));
+                        Log.i("Response: " + jsonObject);
                     }
                 },
                 new Response.ErrorListener() {
