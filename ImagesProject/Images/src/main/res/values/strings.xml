@@ -5,4 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+    <!-- Menu -->
+    <string name="search_title">Search</string>
+
 </resources>
