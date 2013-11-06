@@ -8,4 +8,7 @@
 
     <!-- The search the app should make if it can't find the most recent search results -->
     <string name="default_search">Android</string>
+
+    <!-- In case of errors loading images, one generic message -->
+    <string name="error_search">Sorry, an error has occurred; we could not load your requested images.</string>
 </resources>

@@ -76,7 +76,7 @@ public class ImageDataFragment extends Fragment {
             }
 
             // Notify that we have now loaded zero images
-            mListener.onImagesLoaded(mImageUrls, canLoadMore());
+            notifyImagesLoaded();
 
             requestMoreImages();
         }
@@ -147,15 +147,15 @@ public class ImageDataFragment extends Fragment {
                 mResultCount = cursor.optLong("estimatedResultCount");
 
                 // Notify listeners
-                mListener.onImagesLoaded(mImageUrls, canLoadMore());
+                notifyImagesLoaded();
             }
             else if (responseStatus == 503) {
                 Log.w("Hit Google Image Search rate limit; waiting and retrying");
                 mHandler.sendEmptyMessageDelayed(WHAT_REQUEST_MORE_IMAGES, DELAY_REQUEST);
             }
             else {
-                // TODO: Handle more error situations
-                throw new RuntimeException("Unhandled response status code: " + responseStatus);
+                Log.e("Unknown error code: " + responseStatus);
+                notifyImageLoadError();
             }
         }
     };
@@ -163,9 +163,18 @@ public class ImageDataFragment extends Fragment {
     private final Response.ErrorListener mImageResponseErrorListener = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError volleyError) {
-            mListener.onImageLoadError();
+            notifyImageLoadError();
         }
     };
+
+    private void notifyImagesLoaded() {
+        mListener.onImagesLoaded(mImageUrls, canLoadMore());
+    }
+
+    private void notifyImageLoadError() {
+        mResultCount = 0; // Cannot load more
+        notifyImagesLoaded();
+    }
 
     // Handler
 
@@ -197,7 +206,5 @@ public class ImageDataFragment extends Fragment {
 
     public interface ImageDataFragmentListener {
         public void onImagesLoaded(List<String> imageUrls, boolean canLoadMore);
-
-        public void onImageLoadError();
     }
 }

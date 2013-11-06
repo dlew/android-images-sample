@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.idunnolol.images.R;
 import com.idunnolol.images.utils.Ui;
@@ -23,6 +24,7 @@ public class ImagesFragment extends Fragment {
 
     private GridView mGridView;
     private ProgressBar mProgressBar;
+    private TextView mErrorTextView;
 
     private ImagesAdapter mAdapter;
 
@@ -43,6 +45,7 @@ public class ImagesFragment extends Fragment {
 
         mGridView = Ui.findView(rootView, R.id.grid_view);
         mProgressBar = Ui.findView(rootView, R.id.progress_bar);
+        mErrorTextView = Ui.findView(rootView, R.id.error_text_view);
 
         mAdapter = new ImagesAdapter(getActivity());
         mGridView.setAdapter(mAdapter);
@@ -60,11 +63,20 @@ public class ImagesFragment extends Fragment {
         if (mGridView != null && mProgressBar != null) {
             if (imageUrls == null || imageUrls.size() == 0) {
                 mGridView.setVisibility(View.GONE);
-                mProgressBar.setVisibility(View.VISIBLE);
+
+                if (canLoadMore) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mErrorTextView.setVisibility(View.GONE);
+                }
+                else {
+                    mProgressBar.setVisibility(View.GONE);
+                    mErrorTextView.setVisibility(View.VISIBLE);
+                }
             }
             else {
                 mGridView.setVisibility(View.VISIBLE);
                 mProgressBar.setVisibility(View.GONE);
+                mErrorTextView.setVisibility(View.GONE);
 
                 mAdapter.bind(imageUrls, canLoadMore);
             }
