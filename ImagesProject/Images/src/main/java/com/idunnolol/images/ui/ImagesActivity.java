@@ -94,13 +94,8 @@ public class ImagesActivity extends Activity implements ImageDataFragment.ImageD
     // ImageDataFragmentListener
 
     @Override
-    public void onLoadingImages() {
-        // TODO
-    }
-
-    @Override
     public void onImagesLoaded(List<String> imageUrls, boolean canLoadMore) {
-        // TODO
+        mImagesFragment.bind(imageUrls, canLoadMore);
     }
 
     @Override

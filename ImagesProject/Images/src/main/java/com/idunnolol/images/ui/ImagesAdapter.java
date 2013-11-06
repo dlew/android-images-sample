@@ -30,21 +30,10 @@ public class ImagesAdapter extends BaseAdapter {
         mContext = context;
     }
 
-    public void clearImages() {
-        mImageUrls.clear();
+    public void bind(List<String> imageUrls, boolean canLoadMore) {
+        mImageUrls = imageUrls;
+        mCanLoadMoreImages = canLoadMore;
         notifyDataSetChanged();
-    }
-
-    public void addImageUrls(List<String> imageUrls) {
-        mImageUrls.addAll(imageUrls);
-        notifyDataSetChanged();
-    }
-
-    public void setCanLoadMoreImages(boolean canLoadMoreImages) {
-        if (canLoadMoreImages != mCanLoadMoreImages) {
-            mCanLoadMoreImages = canLoadMoreImages;
-            notifyDataSetChanged();
-        }
     }
 
     @Override

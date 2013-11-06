@@ -11,6 +11,8 @@ import android.widget.ProgressBar;
 import com.idunnolol.images.R;
 import com.idunnolol.images.utils.Ui;
 
+import java.util.List;
+
 public class ImagesFragment extends Fragment {
 
     public static final String TAG = ImagesFragment.class.getName();
@@ -34,4 +36,7 @@ public class ImagesFragment extends Fragment {
         return rootView;
     }
 
+    public void bind(List<String> imageUrls, boolean canLoadMore) {
+        mAdapter.bind(imageUrls, canLoadMore);
+    }
 }
