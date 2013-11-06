@@ -2,10 +2,10 @@
 <resources>
 
     <string name="app_name">Images</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
 
     <!-- Menu -->
     <string name="search_title">Search</string>
 
+    <!-- The search the app should make if it can't find the most recent search results -->
+    <string name="default_search">Android</string>
 </resources>
