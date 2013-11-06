@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.android.volley.Request;
@@ -16,6 +18,7 @@ import com.idunnolol.images.utils.Log;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +35,9 @@ public class ImageDataFragment extends Fragment {
 
     // The maximum number of images Google will return before erroring out
     private static final int MAX_IMAGES = 64;
+
+    // Delay to use when we hit the rate limit
+    private static final long DELAY_REQUEST = 1000 * 10; // 10 seconds
 
     private ImageDataFragmentListener mListener;
 
@@ -64,6 +70,10 @@ public class ImageDataFragment extends Fragment {
             mQuery = query;
             mImageUrls.clear();
             mResultCount = Long.MAX_VALUE;
+            mHandler.removeMessages(WHAT_REQUEST_MORE_IMAGES);
+            if (mCurrentRequest != null) {
+                mCurrentRequest.cancel();
+            }
 
             // Notify that we have now loaded zero images
             mListener.onImagesLoaded(mImageUrls, canLoadMore());
@@ -85,7 +95,8 @@ public class ImageDataFragment extends Fragment {
 
     public void requestMoreImages() {
         if (canLoadMore()
-                && (mCurrentRequest == null || mCurrentRequest.hasHadResponseDelivered())) {
+                && (mCurrentRequest == null || mCurrentRequest.hasHadResponseDelivered())
+                && !mHandler.hasMessages(WHAT_REQUEST_MORE_IMAGES)) {
             // Construct the URL
             Uri.Builder uriBuilder = Uri.parse("https://ajax.googleapis.com/ajax/services/search/images?v=1.0")
                     .buildUpon();
@@ -114,28 +125,34 @@ public class ImageDataFragment extends Fragment {
     private final Response.Listener mImageResponseListener = new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject jsonObject) {
-            JSONObject responseData = jsonObject.optJSONObject("responseData");
+            int responseStatus = jsonObject.optInt("responseStatus");
 
-            if (responseData == null) {
-                Log.w("What is happening:\n" + jsonObject);
+            if (responseStatus == 200) {
+                JSONObject responseData = jsonObject.optJSONObject("responseData");
+
+                // Parse results
+                JSONArray results = responseData.optJSONArray("results");
+                int len = results.length();
+                for (int a = 0; a < len; a++) {
+                    JSONObject result = results.optJSONObject(a);
+                    mImageUrls.add(result.optString("tbUrl"));
+                }
+
+                // Parse result count
+                JSONObject cursor = responseData.optJSONObject("cursor");
+                mResultCount = cursor.optLong("estimatedResultCount");
+
+                // Notify listeners
+                mListener.onImagesLoaded(mImageUrls, canLoadMore());
             }
-
-            // Parse results
-            JSONArray results = responseData.optJSONArray("results");
-            int len = results.length();
-            for (int a = 0; a < len; a++) {
-                JSONObject result = results.optJSONObject(a);
-                mImageUrls.add(result.optString("tbUrl"));
+            else if (responseStatus == 503) {
+                Log.w("Hit Google Image Search rate limit; waiting and retrying");
+                mHandler.sendEmptyMessageDelayed(WHAT_REQUEST_MORE_IMAGES, DELAY_REQUEST);
             }
-
-            // Parse result count
-            JSONObject cursor = responseData.optJSONObject("cursor");
-            mResultCount = cursor.optLong("estimatedResultCount");
-
-            // Notify listeners
-            mListener.onImagesLoaded(mImageUrls, canLoadMore());
-
-            // TODO: Handle error situations
+            else {
+                // TODO: Handle more error situations
+                throw new RuntimeException("Unhandled response status code: " + responseStatus);
+            }
         }
     };
 
@@ -145,6 +162,32 @@ public class ImageDataFragment extends Fragment {
             mListener.onImageLoadError();
         }
     };
+
+    // Handler
+
+    private static final int WHAT_REQUEST_MORE_IMAGES = 1;
+
+    private final Handler mHandler = new LeakSafeHandler(this);
+
+    private static class LeakSafeHandler extends Handler {
+        private final WeakReference<ImageDataFragment> mFragment;
+
+        public LeakSafeHandler(ImageDataFragment fragment) {
+            mFragment = new WeakReference<ImageDataFragment>(fragment);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            ImageDataFragment fragment = mFragment.get();
+            if (fragment != null) {
+                switch (msg.what) {
+                    case WHAT_REQUEST_MORE_IMAGES:
+                        fragment.requestMoreImages();
+                        break;
+                }
+            }
+        }
+    }
 
     // Listener
 
