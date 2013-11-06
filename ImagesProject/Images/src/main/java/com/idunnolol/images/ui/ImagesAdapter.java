@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.android.volley.toolbox.NetworkImageView;
+import com.idunnolol.images.ImagesApplication;
 import com.idunnolol.images.R;
 
 import java.util.ArrayList;
@@ -79,6 +81,9 @@ public class ImagesAdapter extends BaseAdapter {
             if (convertView == null) {
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.row_image, parent, false);
             }
+
+            NetworkImageView networkImageView = (NetworkImageView) convertView;
+            networkImageView.setImageUrl(getItem(position), ImagesApplication.sImageLoader);
         }
         else if (viewType == VIEW_TYPE_LOADING) {
             if (convertView == null) {
