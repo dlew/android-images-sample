@@ -32,6 +32,10 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
+        <provider
+            android:name="com.idunnolol.images.content.RecentImagesSuggestionsProvider"
+            android:authorities="@string/search_authority" />
     </application>
 
 </manifest>

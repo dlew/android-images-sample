@@ -6,11 +6,14 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+
+import com.idunnolol.images.content.RecentImagesSuggestionsProvider;
 
 public class ImagesActivity extends Activity {
 
@@ -31,6 +34,10 @@ public class ImagesActivity extends Activity {
         super.onNewIntent(intent);
 
         String query = intent.getStringExtra(SearchManager.QUERY);
+
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                RecentImagesSuggestionsProvider.AUTHORITY, RecentImagesSuggestionsProvider.MODE);
+        suggestions.saveRecentQuery(query, null);
 
         Log.i("Received search string: " + query);
     }
