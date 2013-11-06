@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/cell_size"
-    android:layout_height="@dimen/cell_size">
+    android:layout_height="@dimen/cell_size"
+    android:padding="4dp">
 
     <ProgressBar
         android:layout_gravity="center"

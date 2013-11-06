@@ -8,8 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:columnWidth="@dimen/cell_size"
-        android:verticalSpacing="8dp"
-        android:horizontalSpacing="8dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
         android:numColumns="auto_fit"
         android:stretchMode="columnWidth"
         android:gravity="center" />
