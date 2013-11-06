@@ -90,6 +90,10 @@ public class ImagesAdapter extends BaseAdapter {
         if (viewType == VIEW_TYPE_IMAGE) {
             if (convertView == null) {
                 convertView = LayoutInflater.from(mContext).inflate(R.layout.row_image, parent, false);
+
+                // One-time setup
+                NetworkImageView networkImageView = (NetworkImageView) convertView;
+                networkImageView.setDefaultImageResId(android.R.color.darker_gray);
             }
 
             NetworkImageView networkImageView = (NetworkImageView) convertView;
